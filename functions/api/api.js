@@ -17,7 +17,7 @@ const myMiddleware = (req, res, next) => {
 const { memberController } = require('./member/member-controller');
 
 // Use nested routes
-app.use('/member/api/v1', memberController);
+app.use('/member/v1', memberController);
 
 // Remove the empty app.use() statement
 // app.use();
