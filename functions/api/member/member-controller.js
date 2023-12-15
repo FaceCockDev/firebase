@@ -68,5 +68,29 @@ router.get('/check-duplicate-email',  (req, res) => {
 });
 
 
+router.get('/check-duplicate-nickname',  (req, res) => {
+    const checkNickName = req.query.nickName;
+
+    if (!checkNickName || checkNickName === "") {
+        res.json(new ApiResponse(
+            "1000",
+            "파라미터가 없습니다."
+        ))
+    }
+    if (checkNickName === "쿠쿠루삥") {
+        res.json(new ApiResponse(
+            "8401",
+            "이미 사용중인 닉네임입니다."
+        ))
+    } else {
+        res.json(new ApiResponse(
+            "0000",
+            "사용 가능한 닉네임입니다."
+        ))
+    }
+});
+
+
+
 // Export the router
 module.exports.memberController = router;
