@@ -1,26 +1,12 @@
 const express = require('express');
 const app = express();
 
-/*
-const router = express.Router();
-const myMiddleware = (req, res, next) => {
-    console.log('Middleware executed!');
-    next();
-};
-
- */
-
-// Using the middleware with router.use
-//router.use(myMiddleware);
-
 // Import route handlers from other files
 const { memberController } = require('./member/member-controller');
+const { operationController } = require('./operation/operation-controller');
 
 // Use nested routes
 app.use('/member/v1', memberController);
+app.use('/operation/v1', operationController);
 
-// Remove the empty app.use() statement
-// app.use();
-
-// Export the Express app
 module.exports = app;
