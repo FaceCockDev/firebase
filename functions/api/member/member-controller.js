@@ -1,6 +1,15 @@
 //const axios = require('axios');
 const ApiResponse = require('../response/ApiResponse');
 const express = require('express');
+const {
+    logLog,
+    logInfo,
+    logDebug,
+    logWarn,
+    logError,
+    logWrite,
+} = require("firebase-functions/logger");
+const admin = require("firebase-admin");
 const router = express.Router();
 
 router.get('/check-duplicate-id',  (req, res) => {
@@ -48,7 +57,6 @@ router.get('/check-duplicate-email',  (req, res) => {
     const checkEmail = req.query.email;
 
     if (!checkEmail || checkEmail === "") {
-
         res.json(new ApiResponse(
             "1000",
             "파라미터가 없습니다."
@@ -91,6 +99,96 @@ router.get('/check-duplicate-nickname',  (req, res) => {
 });
 
 
+
+router.post('/sign-up',  async (req, res) => {
+    const requestData = req.body;
+
+    const id = requestData.id;
+    const password = requestData.password;  //base64
+    const email = requestData.email;
+    const priinfo = requestData.priinfo;
+    const profileUrl = requestData.profileUrl; //storage
+    const nickname = requestData.nickname;
+    const stateId = requestData.stateId;
+    const cityId = requestData.cityId;
+    const fcmToken = requestData.fcmToken;
+
+    if (!id || !password || !email || !priinfo || !profileUrl || nickname || !stateId || !cityId || !fcmToken) {
+        res.json(new ApiResponse(
+            "1000",
+            "파라미터가 없습니다."
+        ))
+    }
+    const decodedPassword = Buffer.from(password, 'base64').toString('utf-8');
+    /*
+    priinfo id와 나머지 정보들 cafe24로 보내서 유저 생성 후 생성 결과 받아올 것
+     */
+
+
+    try {
+        const userRecord = await admin.auth().createUser({
+            email,
+            password,
+            id,
+        });
+        const credentialToken = await admin.auth().createCustomToken(userRecord.uid);
+        res.json(new ApiResponse(
+            "0000",
+            "",
+            {
+                token: credentialToken
+            }
+        ))
+    } catch (error) {
+        logError('Firebase Error  : ', error);
+        res.json(new ApiResponse(
+            "9000",
+            ""
+        ))
+    }
+});
+
+router.get('/login',  async (req, res) => {
+
+    const requestData = req.body;
+
+    const id = requestData.id;
+    const password = requestData.password;  //base64
+    const fcmToken = requestData.fcmToken;
+
+    if (!id || !password || fcmToken) {
+        res.json(new ApiResponse(
+            "1000",
+            "파라미터가 없습니다."
+        ))
+    }
+    const decodedPassword = Buffer.from(password, 'base64').toString('utf-8');
+
+
+    // cafe24로부터 확인,  그 이후에 메일 가져와서 user 정보 가져올 것
+
+
+    //todo cafe24로부터 다 받아와서 이메일 바꿔야 함
+
+    try {
+        const user = await admin.auth().getUserByEmail("efefef@naver.com");
+        const credentialToken = await admin.auth().createCustomToken(user.uid);
+        res.json(new ApiResponse(
+            "0000",
+            "",
+            {
+                token: credentialToken
+            }
+        ))
+
+    } catch (error) {
+        logError('Firebase Error  : ', error);
+        res.json(new ApiResponse(
+            "9000",
+            ""
+        ))
+    }
+});
 
 // Export the router
 module.exports.memberController = router;

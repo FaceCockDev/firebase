@@ -4,7 +4,6 @@ const express = require('express');
 const logger = require("firebase-functions/logger");
 const ApiResponse = require('../response/ApiResponse');
 const router = express.Router();
-admin.initializeApp();
 const db = admin.firestore();
 
 router.get('/state/state-list',  async (req, res) => {
